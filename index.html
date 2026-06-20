@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuestLife - 게이미피케이션 일과 관리</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+    
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-main: #212529;
+            --text-muted: #6c757d;
+            --accent-gold: #f39c12;
+            --accent-blue: #3498db;
+            --border-color: #e9ecef;
+            --accent-red: #e74c3c;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Pretendard Variable", Pretendard, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            padding: 24px;
+        }
+
+        .profile-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .avatar {
+            width: 60px;
+            height: 60px;
+            background: #e8f4fd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .stats {
+            flex-grow: 1;
+        }
+
+        .level-text {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .username {
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .username:hover {
+            color: var(--accent-blue);
+            text-decoration: underline;
+        }
+
+        .edit-name-btn {
+            font-size: 13px;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s ease;
+        }
+
+        .edit-name-btn:hover {
+            opacity: 1;
+        }
+
+        .gold-text {
+            font-size: 14px;
+            color: var(--accent-gold);
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-blue);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: var(--bg-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .tab-btn.active {
+            background: var(--text-main);
+            color: white;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        input[type="text"], input[type="number"] {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        input[type="number"] {
+            width: 100px;
+            flex-grow: 0;
+        }
+
+        .add-btn {
+            padding: 0 16px;
+            border: none;
+            background: var(--accent-blue);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .item-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: white;
+        }
+
+        .item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .item-title {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .item-reward {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .action-group {
+            display: flex;
+            gap: 6px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .complete-btn {
+            background: #e8f8f0;
+            color: #2ecc71;
+        }
+
+        .buy-btn {
+            background: #fef5e7;
+            color: #f39c12;
+        }
+
+        .delete-btn {
+            background: #fce4e4;
+            color: var(--accent-red);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 360px;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            animation: modalFadeIn 0.2s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .modal-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            outline: none;
+            margin-bottom: 16px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .modal-btn-cancel {
+            background: var(--bg-color);
+            color: var(--text-muted);
+        }
+
+        .modal-btn-confirm {
+            background: var(--accent-blue);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 캐릭터 프로필 영역 -->
+    <div class="profile-card">
+        <div class="avatar">🧙‍♂️</div>
+        <div class="stats">
+            <div class="level-text">
+                Lv.<span id="level">1</span> 
+                <span id="username-display" class="username" onclick="openUsernameModal()">플레이어</span>
+                <span class="edit-name-btn" onclick="openUsernameModal()">✏️</span>
+            </div>
+            <div class="gold-text">🪙 <span id="gold">0</span> Gold</div>
+            <div class="progress-bar">
+                <div id="exp-bar" class="progress-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 메뉴 탭 전환 -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('quest')">🛡️ 퀘스트 수행</button>
+        <button class="tab-btn" onclick="switchTab('shop')">🛒 보상 상점</button>
+    </div>
+
+    <!-- 퀘스트 섹션 -->
+    <div id="quest-section">
+        <div class="input-group">
+            <input type="text" id="quest-input" placeholder="오늘 해야 할 일을 입력하세요...">
+            <button class="add-btn" onclick="addQuest()">등록</button>
+        </div>
+        <div id="quest-list" class="list-container"></div>
+    </div>
+
+    <!-- 보상 상점 섹션 -->
+    <div id="shop-section" class="hidden">
+        <div class="input-group" style="flex-direction: column; gap: 8px;">
+            <input type="text" id="shop-input" placeholder="내가 갖고 싶은 보상 입력 (예: 치킨 먹기, 게임 1시간)">
+            <div style="display: flex; gap: 8px;">
+                <input type="number" id="shop-price-input" placeholder="설정할 골드 가격" min="1">
+                <button class="add-btn" style="background: var(--accent-gold); flex-grow: 1;" onclick="addShopItem()">보상 상품 추가</button>
+            </div>
+        </div>
+        <div id="shop-list" class="list-container" style="margin-top: 16px;"></div>
+    </div>
+</div>
+
+<!-- 커스텀 모달 레이아웃 (alert / confirm 대체용) -->
+<div id="custom-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+        <div id="modal-title" class="modal-title">알림</div>
+        <div id="modal-desc" class="modal-desc">내용</div>
+        <input type="text" id="modal-input-field" class="modal-input hidden">
+        <div class="modal-buttons">
+            <button id="modal-btn-cancel" class="modal-btn modal-btn-cancel" onclick="closeCustomModal()">취소</button>
+            <button id="modal-btn-confirm" class="modal-btn modal-btn-confirm">확인</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 로컬 스토리지 연동 및 초기 데이터 정의
+    let state = JSON.parse(localStorage.getItem('questLifeState')) || {
+        username: "플레이어",
+        level: 1,
+        exp: 0,
+        gold: 100,
+        quests: [
+            { id: 1, title: "전공 수업 과제 제출하기", gold: 30, exp: 20 },
+            { id: 2, title: "매일 영단어 20개 외우기", gold: 15, exp: 10 }
+        ],
+        shopItems: [
+            { id: 1, title: "넷플릭스 드라마 1화 시청", price: 50 },
+            { id: 2, title: "맛있는 디저트 먹기", price: 80 }
+        ]
+    };
+
+    // 하위 호환성을 위해 기존 데이터에 username 키가 없을 경우를 대비한 방어 코드
+    if (!state.username) {
+        state.username = "플레이어";
+    }
+
+    function saveState() {
+        localStorage.setItem('questLifeState', JSON.stringify(state));
+        updateUI();
+    }
+
+    function updateUI() {
+        document.getElementById('username-display').innerText = state.username;
+        document.getElementById('level').innerText = state.level;
+        document.getElementById('gold').innerText = state.gold;
+        document.getElementById('exp-bar').style.width = `${state.exp}%`;
+
+        const questList = document.getElementById('quest-list');
+        questList.innerHTML = '';
+        state.quests.forEach(q => {
+            questList.innerHTML += `
+                <div class="item-card">
+                    <div class="item-info">
+                        <span class="item-title">${q.title}</span>
+                        <span class="item-reward">보상: +${q.gold}G / +${q.exp}XP</span>
+                    </div>
+                    <button class="action-btn complete-btn" onclick="completeQuest(${q.id})">완료</button>
+                </div>
+            `;
+        });
+
+        const shopList = document.getElementById('shop-list');
+        shopList.innerHTML = '';
+        state.shopItems.forEach(item => {
+            shopList.innerHTML += `
+                <div class="item-card">
+                    <div class="item-info">
+                        <span class="item-title">${item.title}</span>
+                        <span class="item-reward">가격: ${item.price}G</span>
+                    </div>
+                    <div class="action-group">
+                        <button class="action-btn buy-btn" onclick="buyItem(${item.id})">구매</button>
+                        <button class="action-btn delete-btn" onclick="deleteShopItem(${item.id})">삭제</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    // 모달 제어 전역 변수 콜백
+    let modalCallback = null;
+
+    function openCustomModal(title, desc, isPrompt = false, defaultValue = "", onConfirm = null) {
+        document.getElementById('modal-title').innerText = title;
+        document.getElementById('modal-desc').innerText = desc;
+        
+        const inputField = document.getElementById('modal-input-field');
+        if (isPrompt) {
+            inputField.classList.remove('hidden');
+            inputField.value = defaultValue;
+        } else {
+            inputField.classList.add('hidden');
+        }
+
+        const cancelBtn = document.getElementById('modal-btn-cancel');
+        if (isPrompt || onConfirm !== null) {
+            cancelBtn.classList.remove('hidden');
+        } else {
+            cancelBtn.classList.add('hidden'); // 단순 alert형은 취소 버튼 숨김
+        }
+
+        document.getElementById('custom-modal').classList.remove('hidden');
+        
+        // 확인 버튼 이벤트 리스너 리셋 후 정의
+        const confirmBtn = document.getElementById('modal-btn-confirm');
+        confirmBtn.onclick = function() {
+            if (onConfirm) {
+                if (isPrompt) {
+                    onConfirm(inputField.value);
+                } else {
+                    onConfirm();
+                }
+            }
+            closeCustomModal();
+        };
+    }
+
+    function closeCustomModal() {
+        document.getElementById('custom-modal').classList.add('hidden');
+    }
+
+    // 사용자 이름 편집 모달 호출 함수
+    function openUsernameModal() {
+        openCustomModal(
+            "이름 변경", 
+            "플레이어의 새로운 이름을 설정해 주세요.", 
+            true, 
+            state.username, 
+            function(newName) {
+                if (newName && newName.trim()) {
+                    state.username = newName.trim();
+                    saveState();
+                }
+            }
+        );
+    }
+
+    function switchTab(tab) {
+        const tabs = document.querySelectorAll('.tab-btn');
+        if (tab === 'quest') {
+            document.getElementById('quest-section').classList.remove('hidden');
+            document.getElementById('shop-section').classList.add('hidden');
+            tabs[0].classList.add('active');
+            tabs[1].classList.remove('active');
+        } else {
+            document.getElementById('quest-section').classList.add('hidden');
+            document.getElementById('shop-section').classList.remove('hidden');
+            tabs[0].classList.remove('active');
+            tabs[1].classList.add('active');
+        }
+    }
+
+    function addQuest() {
+        const input = document.getElementById('quest-input');
+        if (!input.value.trim()) return;
+        state.quests.push({
+            id: Date.now(),
+            title: input.value,
+            gold: 20,
+            exp: 15
+        });
+        input.value = '';
+        saveState();
+    }
+
+    function completeQuest(id) {
+        const index = state.quests.findIndex(q => q.id === id);
+        if (index > -1) {
+            state.gold += state.quests[index].gold;
+            state.exp += state.quests[index].exp;
+            
+            if (state.exp >= 100) {
+                state.level += 1;
+                state.exp -= 100;
+                openCustomModal("🎉 레벨 업!", `축하합니다! ${state.username}님이 레벨 업 하셨습니다! (Lv.${state.level})`);
+            }
+            state.quests.splice(index, 1);
+            saveState();
+        }
+    }
+
+    function addShopItem() {
+        const titleInput = document.getElementById('shop-input');
+        const priceInput = document.getElementById('shop-price-input');
+        
+        if (!titleInput.value.trim()) return;
+        
+        const price = parseInt(priceInput.value) > 0 ? parseInt(priceInput.value) : 30;
+
+        state.shopItems.push({
+            id: Date.now(),
+            title: titleInput.value,
+            price: price
+        });
+        
+        titleInput.value = '';
+        priceInput.value = '';
+        saveState();
+    }
+
+    function buyItem(id) {
+        const index = state.shopItems.findIndex(item => item.id === id);
+        if (index > -1) {
+            if (state.gold >= state.shopItems[index].price) {
+                state.gold -= state.shopItems[index].price;
+                openCustomModal("🛒 구매 완료", `[${state.shopItems[index].title}] 구매가 완료되었습니다! 보상을 마음껏 즐겨보세요.`);
+                saveState();
+            } else {
+                openCustomModal("🪙 잔액 부족", "소지한 골드가 부족합니다! 새로운 퀘스트를 달성하여 골드를 모으세요.");
+            }
+        }
+    }
+
+    function deleteShopItem(id) {
+        openCustomModal(
+            "보상 상품 삭제", 
+            "정말 이 보상 아이템을 목록에서 삭제하시겠습니까?", 
+            false, 
+            "", 
+            function() {
+                state.shopItems = state.shopItems.filter(item => item.id !== id);
+                saveState();
+            }
+        );
+    }
+
+    updateUI();
+</script>
+</body>
+</html>
